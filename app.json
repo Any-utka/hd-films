@@ -3,6 +3,7 @@
     "name": "hd-films",
     "slug": "hd-films",
     "version": "1.0.0",
+    "scheme": "hd-films",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
