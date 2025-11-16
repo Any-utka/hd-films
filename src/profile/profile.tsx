@@ -1,11 +1,21 @@
 // src/profile/profile.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Animated,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../src/theme/theme';
 import { loginUser } from '../../src/services/auth';
 import { useUser } from '../../src/context/UserContext';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -13,7 +23,23 @@ export default function ProfileScreen() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  // Анимация глазика
+  const eyeScale = useState(new Animated.Value(1))[0];
+
+  const animateEye = () => {
+    Animated.sequence([
+      Animated.timing(eyeScale, { toValue: 0.8, duration: 100, useNativeDriver: true }),
+      Animated.timing(eyeScale, { toValue: 1, duration: 100, useNativeDriver: true }),
+    ]).start();
+  };
+
+  const togglePassword = () => {
+    animateEye();
+    setShowPassword((prev) => !prev);
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -23,7 +49,7 @@ export default function ProfileScreen() {
 
     const loggedUser = await loginUser(email, password);
     if (loggedUser) {
-      setUser(loggedUser); // сохраняем глобально в UserContext
+      setUser(loggedUser);
       setError('');
     } else {
       setError('Неверный email или пароль');
@@ -31,13 +57,12 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = () => {
-    setUser(null); // глобальный logout
+    setUser(null);
     setEmail('');
     setPassword('');
   };
 
   const goToRegister = () => router.push('/register');
-  const goToEdit = () => router.push('/profile/edit');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,10 +72,6 @@ export default function ProfileScreen() {
             <Image source={{ uri: user.avatar }} style={styles.avatar} />
             <Text style={styles.name}>{user.name}</Text>
             <Text style={styles.email}>{user.email}</Text>
-
-            <TouchableOpacity style={styles.editButton} onPress={goToEdit}>
-              <Text style={styles.editText}>Редактировать профиль</Text>
-            </TouchableOpacity>
 
             <TouchableOpacity style={styles.button} onPress={handleLogout}>
               <Text style={styles.buttonText}>Выйти</Text>
@@ -68,14 +89,35 @@ export default function ProfileScreen() {
               onChangeText={setEmail}
               style={styles.input}
             />
-            <TextInput
-              placeholder="Пароль"
-              placeholderTextColor="#888"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              style={styles.input}
-            />
+
+            {/* Поле пароля с глазиком */}
+            <View style={{ position: 'relative', justifyContent: 'center' }}>
+              <TextInput
+                placeholder="Пароль"
+                placeholderTextColor="#888"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                style={styles.input}
+              />
+
+              <Animated.View
+                style={{
+                  position: 'absolute',
+                  right: 16,
+                  padding: 4,
+                  transform: [{ scale: eyeScale }],
+                }}
+              >
+                <TouchableOpacity onPress={togglePassword}>
+                  <Ionicons
+                    name={showPassword ? 'eye-off' : 'eye'}
+                    size={24}
+                    color="#888"
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
 
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Войти</Text>
@@ -128,10 +170,6 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing(1.8),
     alignItems: 'center',
     marginTop: theme.spacing(2),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
     elevation: 5,
   },
   buttonText: {
@@ -153,10 +191,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     padding: theme.spacing(4),
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
     elevation: 6,
     marginTop: theme.spacing(4),
   },
@@ -178,35 +212,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.muted,
     marginBottom: theme.spacing(3),
-  },
-  extraInfo: {
-    marginTop: theme.spacing(3),
-    width: '100%',
-    padding: theme.spacing(2),
-    backgroundColor: '#1f1f2b',
-    borderRadius: theme.radius.md,
-  },
-  extraTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginBottom: theme.spacing(1),
-  },
-  extraText: {
-    fontSize: 14,
-    color: theme.colors.muted,
-    marginBottom: theme.spacing(1),
-  },
-  editButton: {
-    backgroundColor: '#44475a',
-    borderRadius: theme.radius.md,
-    paddingVertical: theme.spacing(1.5),
-    alignItems: 'center',
-    marginTop: theme.spacing(3),
-  },
-  editText: {
-    color: theme.colors.accent,
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });
