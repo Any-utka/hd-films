@@ -1,14 +1,15 @@
+// app/register.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { theme } from '../src/theme/theme';
 import { registerUser } from '../src/data/users';
-import { useRouter } from 'expo-router';
+import Profile from '../src/profile/profile';
 
 export default function RegisterScreen() {
-  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [registered, setRegistered] = useState(false); // отслеживаем регистрацию
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
@@ -19,11 +20,16 @@ export default function RegisterScreen() {
     const success = await registerUser({ name, email, password });
     if (success) {
       Alert.alert('Успех', 'Регистрация прошла успешно!');
-      router.push('/profile/login');
+      setRegistered(true); // показываем профиль
     } else {
       Alert.alert('Ошибка', 'Пользователь с таким email уже существует');
     }
   };
+
+  if (registered) {
+    // рендерим профиль вместо экрана регистрации
+    return <Profile />;
+  }
 
   return (
     <View style={styles.container}>
