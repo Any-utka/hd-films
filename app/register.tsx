@@ -1,15 +1,16 @@
-// app/register.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { theme } from '../src/theme/theme';
 import { registerUser } from '../src/data/users';
-import Profile from '../src/profile/profile';
+import { useRouter } from 'expo-router';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [registered, setRegistered] = useState(false); // отслеживаем регистрацию
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
@@ -17,19 +18,24 @@ export default function RegisterScreen() {
       return;
     }
 
+    // проверка валидного email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Ошибка', 'Введите корректный email');
+      return;
+    }
+
+    setLoading(true);
     const success = await registerUser({ name, email, password });
+    setLoading(false);
+
     if (success) {
       Alert.alert('Успех', 'Регистрация прошла успешно!');
-      setRegistered(true); // показываем профиль
+      router.replace('/profile'); // переход на экран аутентификации
     } else {
       Alert.alert('Ошибка', 'Пользователь с таким email уже существует');
     }
   };
-
-  if (registered) {
-    // рендерим профиль вместо экрана регистрации
-    return <Profile />;
-  }
 
   return (
     <View style={styles.container}>
@@ -62,8 +68,14 @@ export default function RegisterScreen() {
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Зарегистрироваться</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleRegister}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>
+          {loading ? 'Регистрация...' : 'Зарегистрироваться'}
+        </Text>
       </TouchableOpacity>
     </View>
   );

@@ -1,3 +1,4 @@
+// src/types/User.tsx
 export type User = {
   email: string;
   password: string;

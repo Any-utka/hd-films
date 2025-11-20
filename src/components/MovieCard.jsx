@@ -71,10 +71,7 @@ export default function MovieCard({ movie, isFavorite: initialFavorite, onToggle
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing(1.5),
-    marginBottom: 12,
+    ...theme.globalStyles.card,
   },
   poster: {
     width: 100,
@@ -91,34 +88,26 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   meta: { color: theme.colors.muted, fontSize: 13, marginBottom: 4 },
-  genres: {
-    color: '#00d4ff',
-    fontSize: 13,
-    marginBottom: 6,
-    fontWeight: '500',
-  },
-  overview: {
-    color: '#ddd',
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  showMore: {
-    color: '#919090b4',
-    fontWeight: 'bold',
-    marginTop: 4,
-    marginBottom: 8,
-    fontSize: 12,
-  },
+  genres: { color: '#00d4ff', fontSize: 13, marginBottom: 6, fontWeight: '500' },
+  overview: { color: '#ddd', fontSize: 12, lineHeight: 16 },
   button: {
-    marginTop: 4,
-    paddingVertical: 6,
-    paddingHorizontal: 7,
-    borderRadius: 8,
-    backgroundColor: '#44475a',
-    alignSelf: 'flex-start',
-  },
-  buttonText: {
-    color: theme.colors.accent,
-    fontWeight: 'bold',
-  },
+  ...theme.globalStyles.button,
+  marginTop: 4,
+  paddingVertical: 6,
+  paddingHorizontal: 11,
+  alignSelf: 'flex-start',
+  backgroundColor: '#44475a', 
+},
+buttonText: {
+  color: theme.colors.accent,
+  fontWeight: 'bold',
+  fontSize: 13,
+},
+showMore: {
+  color: theme.colors.accent, 
+  fontWeight: 'bold',
+  marginTop: 4,
+  marginBottom: 8,
+  fontSize: 13,
+},
 });
