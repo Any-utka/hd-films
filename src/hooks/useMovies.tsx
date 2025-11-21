@@ -54,9 +54,23 @@ const MOCK_MOVIES: Movie[] = [
   },
 ];
 
+/**
+ * Хук для работы с фильмами и избранным пользователя
+ * @param {User | null} currentUser Текущий пользователь или null
+ * @returns {{
+ *   movies: Movie[],
+ *   favorites: number[],
+ *   toggleFav: (id: number) => void,
+ *   loading: boolean
+ * }} Данные фильмов, избранного и функции управления
+ */
+
 export function useMovies(currentUser: User | null) {
+  // Состояние списка фильмов
   const [movies, setMovies] = useState<Movie[]>([]);
+  // Состояние ID избранных фильмов
   const [favorites, setFavorites] = useState<number[]>([]);
+  // Состояние загрузки
   const [loading, setLoading] = useState(true);
 
   // загрузка фильмов и избранного
@@ -77,7 +91,6 @@ export function useMovies(currentUser: User | null) {
     return () => clearTimeout(timer);
   }, [currentUser]);
 
-  // переключение избранного с мгновенным обновлением UI
   const toggleFav = async (id: number) => {
     if (!currentUser) {
       Alert.alert('Ошибка', 'Для добавления фильма в избранное нужно войти в профиль');

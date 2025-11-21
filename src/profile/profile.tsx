@@ -17,6 +17,12 @@ import { useUser } from '../../src/context/UserContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
+/**
+ * Экран профиля и аутентификации пользователя
+ * Показывает профиль, если пользователь вошёл,
+ * или форму входа, если нет.
+ * @returns JSX элемент экрана профиля
+ */
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, setUser } = useUser();
@@ -26,9 +32,12 @@ export default function ProfileScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  // Анимация глазика
+  // Анимация для глазика поля пароля
   const eyeScale = useState(new Animated.Value(1))[0];
 
+  /**
+   * Анимирует глазик при переключении видимости пароля
+   */
   const animateEye = () => {
     Animated.sequence([
       Animated.timing(eyeScale, { toValue: 0.8, duration: 100, useNativeDriver: true }),
@@ -36,11 +45,17 @@ export default function ProfileScreen() {
     ]).start();
   };
 
+  /**
+   * Переключает видимость пароля
+   */
   const togglePassword = () => {
     animateEye();
     setShowPassword((prev) => !prev);
   };
 
+  /**
+   * Обработчик входа пользователя
+   */
   const handleLogin = async () => {
     if (!email || !password) {
       setError('Заполните все поля');
@@ -56,12 +71,18 @@ export default function ProfileScreen() {
     }
   };
 
+  /**
+   * Выход пользователя
+   */
   const handleLogout = () => {
     setUser(null);
     setEmail('');
     setPassword('');
   };
 
+  /**
+   * Переход на экран регистрации
+   */
   const goToRegister = () => router.push('/register');
 
   return (

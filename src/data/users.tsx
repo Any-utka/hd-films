@@ -5,10 +5,16 @@ import { User } from '../types/User';
 
 const STORAGE_KEY = 'users';
 
-// 🔹 Хэширование пароля
+/**
+ * Хеширует пароль с помощью SHA256.
+ * @param password Пароль пользователя
+ * @returns Хеш пароля
+ */
 const hashPassword = (password: string) => CryptoJS.SHA256(password).toString();
 
-// Дефолтные пользователи
+/**
+ * Дефолтные пользователи приложения
+ */
 const defaultUsers: User[] = [
   {
     name: 'Иван Иванов',
@@ -25,7 +31,11 @@ const defaultUsers: User[] = [
   },
 ];
 
-// Получаем пользователей (только дефолтные)
+/**
+ * Получает список пользователей из хранилища.
+ * Если данных нет, возвращает дефолтных пользователей.
+ * @returns Список пользователей
+ */
 export async function getUsers(): Promise<User[]> {
   const stored = await AsyncStorage.getItem(STORAGE_KEY);
   if (stored) return JSON.parse(stored);
@@ -34,12 +44,19 @@ export async function getUsers(): Promise<User[]> {
   return defaultUsers;
 }
 
-// Сохраняем пользователей в AsyncStorage
+/**
+ * Сохраняет список пользователей в AsyncStorage
+ * @param users Список пользователей
+ */
 async function saveUsers(users: User[]) {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(users));
 }
 
-// Регистрация нового пользователя (не сохраняется после перезапуска)
+/**
+ * Регистрирует нового пользователя
+ * @param user Данные пользователя без аватара
+ * @returns true, если регистрация успешна, иначе false
+ */
 export async function registerUser(user: Omit<User, 'avatar'>): Promise<boolean> {
   const users = await getUsers();
 
@@ -57,7 +74,12 @@ export async function registerUser(user: Omit<User, 'avatar'>): Promise<boolean>
   return true;
 }
 
-// Логин
+/**
+ * Логинит пользователя по email и паролю
+ * @param email Email пользователя
+ * @param password Пароль пользователя
+ * @returns Объект пользователя или null, если не найден
+ */
 export async function loginUser(email: string, password: string): Promise<User | null> {
   const users = await getUsers();
   const hashed = hashPassword(password);

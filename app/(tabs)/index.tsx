@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background, 
   },
   headerWrapper: {
-    paddingTop: 10, // минимальный отступ сверху
+    paddingTop: 10, 
     paddingHorizontal: 20,
     paddingBottom: 4,
   },
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 15,
-    paddingBottom: 100, // добавлено, чтобы список не пересекался с нижними табами
+    paddingBottom: 100, 
   },
   loading: { 
     color: theme.colors.muted, 

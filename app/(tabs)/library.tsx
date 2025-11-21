@@ -5,16 +5,23 @@ import { theme } from '../../src/theme/theme';
 import { useMovies } from '../../src/hooks/useMovies';
 import { useUser } from '../../src/context/UserContext';
 
+/**
+ * Экран библиотеки с избранными фильмами пользователя
+ * @returns JSX элемент экрана
+ */
 export default function LibraryScreen() {
   const { user } = useUser();
   const { movies, favorites: globalFavorites, toggleFav, loading } = useMovies(user);
 
+  // Локальное состояние избранных фильмов
   const [favorites, setFavorites] = useState<number[]>(globalFavorites);
 
+  // Синхронизация локальных избранных с глобальными
   useEffect(() => {
     setFavorites(globalFavorites);
   }, [globalFavorites]);
 
+  // Фильтруем фильмы только с пометкой "избранное"
   const favoriteMovies = movies.filter((movie) => favorites.includes(movie.id));
 
   if (loading) {
@@ -25,6 +32,10 @@ export default function LibraryScreen() {
     );
   }
 
+  /**
+   * Обработчик добавления/удаления фильма из избранного
+   * @param id ID фильма
+   */
   const handleToggleFav = (id: number) => {
     if (!user) {
       Alert.alert('Ошибка', 'Для изменения избранного нужно войти в профиль');
@@ -66,7 +77,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: theme.colors.background, // фон всегда тёмный
+    backgroundColor: theme.colors.background, // фон экрана
   },
   movieItem: {
     flexDirection: 'row',

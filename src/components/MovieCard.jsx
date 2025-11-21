@@ -4,15 +4,27 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, Linking } from 
 import { theme } from '../theme/theme';
 import { useUser } from '../context/UserContext';
 
+/**
+ * Карточка фильма с информацией, описанием и кнопкой избранного
+ * @param {Object} props
+ * @param {Object} props.movie Данные фильма
+ * @param {boolean} props.isFavorite Начальное состояние избранного
+ * @param {Function} props.onToggleFav Колбэк при добавлении/удалении из избранного
+ * @returns JSX элемент карточки фильма
+ */
 export default function MovieCard({ movie, isFavorite: initialFavorite, onToggleFav }) {
   const { user } = useUser();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
-  const [expanded, setExpanded] = useState(false); // ✅ состояние для описания
+  const [expanded, setExpanded] = useState(false);
 
+  // Синхронизация состояния избранного с пропсом
   useEffect(() => {
     setIsFavorite(initialFavorite);
   }, [initialFavorite]);
 
+  /**
+   * Открывает ссылку на сайт фильма
+   */
   const handleOpenLink = async () => {
     if (!user) {
       Alert.alert('Ошибка', 'Чтобы перейти на сайт фильма, нужно войти в профиль');
@@ -23,6 +35,9 @@ export default function MovieCard({ movie, isFavorite: initialFavorite, onToggle
     }
   };
 
+  /**
+   * Добавляет или удаляет фильм из избранного
+   */
   const handleToggleFav = () => {
     if (!user) {
       Alert.alert('Ошибка', 'Чтобы добавить фильм в избранное, нужно войти в профиль');
@@ -32,7 +47,10 @@ export default function MovieCard({ movie, isFavorite: initialFavorite, onToggle
     onToggleFav();
   };
 
-  const toggleOverview = () => setExpanded(prev => !prev); // ✅ переключатель для описания
+  /**
+   * Переключает развёрнутость описания фильма
+   */
+  const toggleOverview = () => setExpanded(prev => !prev); 
 
   return (
     <View style={styles.card}>
@@ -47,7 +65,7 @@ export default function MovieCard({ movie, isFavorite: initialFavorite, onToggle
         </Text>
         <Text style={styles.genres}>{movie.genres.join(', ')}</Text>
 
-        {/* ✅ Описание с возможностью разворачивания */}
+        {/* Описание с возможностью разворачивания */}
         <Text style={styles.overview} numberOfLines={expanded ? undefined : 3}>
           {movie.overview}
         </Text>
@@ -91,23 +109,23 @@ const styles = StyleSheet.create({
   genres: { color: '#00d4ff', fontSize: 13, marginBottom: 6, fontWeight: '500' },
   overview: { color: '#ddd', fontSize: 12, lineHeight: 16 },
   button: {
-  ...theme.globalStyles.button,
-  marginTop: 4,
-  paddingVertical: 6,
-  paddingHorizontal: 11,
-  alignSelf: 'flex-start',
-  backgroundColor: '#44475a', 
-},
-buttonText: {
-  color: theme.colors.accent,
-  fontWeight: 'bold',
-  fontSize: 13,
-},
-showMore: {
-  color: theme.colors.accent, 
-  fontWeight: 'bold',
-  marginTop: 4,
-  marginBottom: 8,
-  fontSize: 13,
-},
+    ...theme.globalStyles.button,
+    marginTop: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 11,
+    alignSelf: 'flex-start',
+    backgroundColor: '#44475a',
+  },
+  buttonText: {
+    color: theme.colors.accent,
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
+  showMore: {
+    color: theme.colors.accent,
+    fontWeight: 'bold',
+    marginTop: 4,
+    marginBottom: 8,
+    fontSize: 13,
+  },
 });

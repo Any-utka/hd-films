@@ -11,14 +11,13 @@ export default function TabLayout() {
         screenOptions={{
           headerStyle: {
             backgroundColor: theme.colors.background,
-            height: 60, // уменьшил высоту хедера (по умолчанию ~96)
+            height: 60, 
           },
           headerTitleStyle: {
             color: theme.colors.accent,
             fontWeight: 'bold',
-            fontSize: 18, // чуть меньше, чтобы гармонично смотрелось
+            fontSize: 18, 
           },
-          //headerTitleAlign: 'right',
           headerShadowVisible: false,
 
           // ↓↓↓ Настройки нижних табов ↓↓↓

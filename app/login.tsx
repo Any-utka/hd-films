@@ -1,14 +1,23 @@
+// app/login.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { theme } from '../src/theme/theme';
 import { loginUser } from '../src/data/users';
 import { useRouter } from 'expo-router';
 
+/**
+ * Экран входа пользователя
+ * @returns JSX элемент экрана
+ */
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  /**
+   * Обработчик кнопки "Войти"
+   * Проверяет поля и логинит пользователя
+   */
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Ошибка', 'Заполните все поля');
@@ -18,7 +27,7 @@ export default function LoginScreen() {
     const user = await loginUser(email, password);
     if (user) {
       Alert.alert('Успех', `Добро пожаловать, ${user.name}!`);
-      router.push('/profile'); // переход на экран профиля
+      router.push('/profile');
     } else {
       Alert.alert('Ошибка', 'Неверный email или пароль');
     }
@@ -61,7 +70,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.background, // фон экрана
     padding: 20,
     justifyContent: 'center',
   },
