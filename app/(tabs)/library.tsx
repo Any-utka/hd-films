@@ -4,6 +4,7 @@ import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, Alert } from
 import { theme } from '../../src/theme/theme';
 import { useMovies } from '../../src/hooks/useMovies';
 import { useUser } from '../../src/context/UserContext';
+import { useFocusEffect } from 'expo-router';
 
 /**
  * Экран библиотеки с избранными фильмами пользователя
@@ -11,15 +12,24 @@ import { useUser } from '../../src/context/UserContext';
  */
 export default function LibraryScreen() {
   const { user } = useUser();
-  const { movies, favorites: globalFavorites, toggleFav, loading } = useMovies(user);
+  const { movies, favorites: globalFavorites, toggleFav, loading, getFavorites } = useMovies(user);
 
   // Локальное состояние избранных фильмов
   const [favorites, setFavorites] = useState<number[]>(globalFavorites);
 
   // Синхронизация локальных избранных с глобальными
-  useEffect(() => {
-    setFavorites(globalFavorites);
-  }, [globalFavorites]);
+  // useEffect(() => {
+  //   setFavorites(globalFavorites);
+  // }, [globalFavorites]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      (async () => {
+        const data = await getFavorites(user!);
+        setFavorites(data ? JSON.parse(data) : []);
+      })();
+    }, [globalFavorites])
+  );
 
   // Фильтруем фильмы только с пометкой "избранное"
   const favoriteMovies = movies.filter((movie) => favorites.includes(movie.id));

@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '../types/User';
 import { Alert } from 'react-native';
+import { getFavorites } from '../services/favorites';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 const FAVORITES_KEY = 'favorites_movies';
 
@@ -74,6 +76,7 @@ export function useMovies(currentUser: User | null) {
   const [loading, setLoading] = useState(true);
 
   // загрузка фильмов и избранного
+
   useEffect(() => {
     const timer = setTimeout(async () => {
       setMovies(MOCK_MOVIES);
@@ -90,6 +93,10 @@ export function useMovies(currentUser: User | null) {
 
     return () => clearTimeout(timer);
   }, [currentUser]);
+
+  const getFavorites = async (currentUser: User) => {
+    return await AsyncStorage.getItem(FAVORITES_KEY + '_' + currentUser.email);
+  }
 
   const toggleFav = async (id: number) => {
     if (!currentUser) {
@@ -111,5 +118,5 @@ export function useMovies(currentUser: User | null) {
     });
   };
 
-  return { movies, favorites, toggleFav, loading };
+  return { movies, favorites, toggleFav, loading, getFavorites };
 }
