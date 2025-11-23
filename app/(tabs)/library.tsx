@@ -1,59 +1,79 @@
-// app/(tabs)/library.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { theme } from '../../src/theme/theme';
 import { useMovies } from '../../src/hooks/useMovies';
 import { useUser } from '../../src/context/UserContext';
 import { useFocusEffect } from 'expo-router';
+import { setupDatabase, getDB } from '../../src/data/db';
 
-/**
- * Экран библиотеки с избранными фильмами пользователя
- * @returns JSX элемент экрана
- */
 export default function LibraryScreen() {
   const { user } = useUser();
-  const { movies, favorites: globalFavorites, toggleFav, loading, getFavorites } = useMovies(user);
+  const [dbReady, setDbReady] = useState(false);
+  const [favorites, setFavorites] = useState<number[]>([]);
 
-  // Локальное состояние избранных фильмов
-  const [favorites, setFavorites] = useState<number[]>(globalFavorites);
-
-  // Синхронизация локальных избранных с глобальными
-  // useEffect(() => {
-  //   setFavorites(globalFavorites);
-  // }, [globalFavorites]);
-
+  // Инициализация БД и загрузка избранного при каждом фокусе
   useFocusEffect(
     React.useCallback(() => {
-      (async () => {
-        const data = await getFavorites(user!);
-        setFavorites(data ? JSON.parse(data) : []);
-      })();
-    }, [globalFavorites])
+      let isActive = true;
+
+      const initDBAndLoadFavorites = async () => {
+        try {
+          await setupDatabase();
+          if (!isActive) return;
+          setDbReady(true);
+
+          if (!user) {
+            setFavorites([]);
+            return;
+          }
+
+          const db = await getDB();
+          const userRow = await db.getFirstAsync('SELECT id FROM users WHERE email = ?;', [user.email]);
+          if (!userRow) {
+            setFavorites([]);
+            return;
+          }
+
+          const favRes = await db.getAllAsync('SELECT movieId FROM favorites WHERE userId = ?;', [userRow.id]);
+          if (isActive) setFavorites(favRes.map((f: any) => f.movieId));
+        } catch (err) {
+          console.error('Ошибка инициализации БД или загрузки избранного:', err);
+        }
+      };
+
+      initDBAndLoadFavorites();
+      return () => { isActive = false; };
+    }, [user])
   );
 
-  // Фильтруем фильмы только с пометкой "избранное"
+  const { movies, toggleFav, loading } = useMovies(user, dbReady);
   const favoriteMovies = movies.filter((movie) => favorites.includes(movie.id));
 
-  if (loading) {
+  const handleToggleFav = async (id: number) => {
+    if (!user) {
+      Alert.alert('Ошибка', 'Для изменения избранного нужно войти в профиль');
+      return;
+    }
+
+    // Оптимистично обновляем UI
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+    );
+
+    try {
+      await toggleFav(id);
+    } catch (err) {
+      console.error('Ошибка при toggleFav:', err);
+    }
+  };
+
+  if (!dbReady || loading) {
     return (
       <View style={styles.container}>
         <Text style={styles.emptyText}>Загрузка...</Text>
       </View>
     );
   }
-
-  /**
-   * Обработчик добавления/удаления фильма из избранного
-   * @param id ID фильма
-   */
-  const handleToggleFav = (id: number) => {
-    if (!user) {
-      Alert.alert('Ошибка', 'Для изменения избранного нужно войти в профиль');
-      return;
-    }
-    setFavorites((prev) => prev.filter((f) => f !== id));
-    toggleFav(id);
-  };
 
   return (
     <View style={styles.container}>
@@ -84,27 +104,11 @@ export default function LibraryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: theme.colors.background, // фон экрана
-  },
-  movieItem: {
-    flexDirection: 'row',
-    backgroundColor: '#1f1f2b',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-    alignItems: 'center',
-  },
+  container: { flex: 1, padding: 16, backgroundColor: theme.colors.background },
+  movieItem: { flexDirection: 'row', backgroundColor: '#1f1f2b', padding: 12, borderRadius: 12, marginBottom: 12, alignItems: 'center' },
   poster: { width: 80, height: 120, borderRadius: 8 },
   title: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   genres: { color: theme.colors.muted, marginTop: 4 },
   remove: { color: 'red', marginTop: 8, fontWeight: 'bold' },
-  emptyText: {
-    color: theme.colors.muted,
-    textAlign: 'center',
-    marginTop: 32,
-    fontSize: 16,
-  },
+  emptyText: { color: theme.colors.muted, textAlign: 'center', marginTop: 32, fontSize: 16 },
 });

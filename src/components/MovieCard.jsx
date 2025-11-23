@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     ...theme.globalStyles.button,
     marginTop: 4,
     paddingVertical: 6,
-    paddingHorizontal: 11,
+    paddingHorizontal: 8,
     alignSelf: 'flex-start',
     backgroundColor: '#44475a',
   },

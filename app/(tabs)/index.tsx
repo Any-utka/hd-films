@@ -1,18 +1,26 @@
-// app/(tabs)/index.tsx
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMovies } from '../../src/hooks/useMovies';
 import MovieCard from '../../src/components/MovieCard';
 import { theme } from '../../src/theme/theme';
 import { useUser } from '../../src/context/UserContext';
-import { Alert } from 'react-native';
+import { setupDatabase } from '../../src/data/db';
 
 export default function CatalogScreen() {
   const { user } = useUser();
-  const { movies, favorites, toggleFav, loading } = useMovies(user);
+  const [dbReady, setDbReady] = useState(false);
 
-  if (loading) return <Text style={styles.loading}>Загрузка...</Text>;
+  // Инициализация базы
+  useEffect(() => {
+    const initDB = async () => {
+      await setupDatabase();
+      setDbReady(true);
+    };
+    initDB();
+  }, []);
+
+  const { movies, favorites, toggleFav, loading } = useMovies(user, dbReady);
 
   const handleToggleFav = (id: number) => {
     if (!user) {
@@ -21,6 +29,10 @@ export default function CatalogScreen() {
     }
     toggleFav(id);
   };
+
+  if (!dbReady || loading) {
+    return <Text style={styles.loading}>Загрузка...</Text>;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -45,6 +57,7 @@ export default function CatalogScreen() {
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { 
