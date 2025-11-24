@@ -1,3 +1,4 @@
+// src/services/favorites.tsx
 import { getDB } from '../data/db';
 import { User } from '../types/User';
 

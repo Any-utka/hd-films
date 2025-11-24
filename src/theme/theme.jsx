@@ -1,3 +1,4 @@
+// src/theme/theme.jsx
 export const theme = {
   colors: {
     background: '#1a1a2e', 

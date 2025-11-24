@@ -1,3 +1,4 @@
+// src/data/db.tsx
 import * as SQLite from "expo-sqlite";
 import { Movie } from "../hooks/useMovies";
 import * as CryptoJS from "crypto-js";

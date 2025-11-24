@@ -1,3 +1,4 @@
+// src/types/expo-sqlite.d.tsx
 declare module 'expo-sqlite' {
   export interface SQLTransaction {
     executeSql(

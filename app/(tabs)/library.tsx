@@ -1,3 +1,4 @@
+// app/(tabs)/library.tsx
 import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { theme } from '../../src/theme/theme';

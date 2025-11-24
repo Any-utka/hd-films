@@ -1,3 +1,4 @@
+// src/hooks/useMovies.tsx
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { getDB } from '../data/db';

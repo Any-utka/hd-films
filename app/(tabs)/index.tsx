@@ -1,3 +1,4 @@
+// app/(tabs)/index.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
